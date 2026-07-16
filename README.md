@@ -7,8 +7,13 @@ infrastructure end-to-end with Terraform, with no manual console clicks and no p
 
 | # | Project | What it deploys | Status |
 |---|---------|-----------------|--------|
-| 1 | [WordPress on EC2](assignment-1-wordpress/) | Full LAMP + WordPress stack on a single EC2 instance, provisioned via `user_data` | Complete |
-| 2 | [EC2 with Cloud-Init](assignment-2-cloudinit/) | EC2 instance configured on boot with a cloud-init YAML file | In progress |
+| 1 | [WordPress on EC2](assignment-1-wordpress/) | Full LAMP and WordPress stack on a single EC2 instance, bootstrapped with an imperative bash script | Complete |
+| 2 | [NGINX with Cloud-Init](assignment-2-cloudinit/) | NGINX web server configured on boot with a declarative cloud-init YAML file | Complete |
+
+The two projects deliberately solve the same class of problem in opposite ways. Project 1
+bootstraps a server with bash through `user_data` and hits an apt lock race condition that silently
+breaks the deploy. Project 2 does comparable work declaratively with cloud-init, where that race
+cannot occur. Reading them in order is the point.
 
 ## Repository structure
 
@@ -23,7 +28,13 @@ infrastructure end-to-end with Terraform, with no manual console clicks and no p
 │   ├── variables.tf               # Region and instance type inputs
 │   ├── outputs.tf                 # Public IP and site URL
 │   └── setup.sh                   # Bootstrap script passed as user_data
-└── assignment-2-cloudinit/        # Project 2: cloud-init
+└── assignment-2-cloudinit/        # Project 2: NGINX via cloud-init
+    ├── README.md                  # Full write-up, including the contrast with project 1
+    ├── provider.tf                # AWS provider and version pinning
+    ├── main.tf                    # AMI lookup, security group, EC2 instance
+    ├── variables.tf               # Region and instance type inputs
+    ├── outputs.tf                 # Site URL
+    └── cloud-init.yaml            # Declarative instance config passed as user_data
 ```
 
 ## Conventions used across projects
