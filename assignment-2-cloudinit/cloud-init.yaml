@@ -1,0 +1,29 @@
+#cloud-config
+
+# 1. Update the apt database and upgrade packages on first boot
+package_update: true
+package_upgrade: true
+
+# 2. Define the packages we want installed
+packages:
+  - nginx
+
+# 3. Create a custom index.html file
+write_files:
+  - path: /var/www/html/index.html
+    permissions: '0644'
+    owner: www-data:www-data
+    content: |
+      <!DOCTYPE html>
+      <html>
+      <head><title>Assignment 2</title></head>
+      <body>
+        <h1>Success!</h1>
+        <p>This Nginx server was deployed and configured entirely by Terraform and Cloud-Init.</p>
+      </body>
+      </html>
+
+# 4. Ensure the service is running
+runcmd:
+  - systemctl enable nginx
+  - systemctl start nginx
