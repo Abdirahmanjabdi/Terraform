@@ -164,66 +164,32 @@ terraform destroy                # tear it down when finished
 
 ## Screenshots
 
-> **How to add these:** save each image into `assignment-1-wordpress/screenshots/` using the exact
-> filename below and the embed will render automatically. See
-> [`screenshots/README.md`](screenshots/) for the full capture checklist.
-
-### 1. `terraform init` — provider downloaded
-
-> 📸 **Capture from:** your terminal, in `assignment-1-wordpress/`, after running `terraform init`.
-> Show the "Terraform has been successfully initialized!" message.
-
-![terraform init output](screenshots/01-terraform-init.png)
-
-### 2. `terraform plan` — 2 resources to add
-
-> 📸 **Capture from:** your terminal, after `terraform plan`. Show the
-> "Plan: 2 to add, 0 to change, 0 to destroy." summary line.
-
-![terraform plan output](screenshots/02-terraform-plan.png)
 
 ### 3. `terraform apply` — outputs with the live URL
 
-> 📸 **Capture from:** your terminal, after `terraform apply` completes. Show the
-> "Apply complete!" line **and** the `wordpress_public_ip` / `wordpress_url` outputs.
+<img width="878" height="305" alt="image" src="https://github.com/user-attachments/assets/00b758da-1e0b-40a6-bdf2-1adacdeb5f38" />
 
-![terraform apply output](screenshots/03-terraform-apply.png)
 
 ### 4. WordPress installer — the stack is live
 
-> 📸 **Capture from:** your browser at `http://<public-ip>` (from the apply output), 2–4 minutes
-> after apply. Show the WordPress language-selection / "Welcome" install screen. This is the proof
-> that Apache, PHP **and** MySQL all came up correctly from `user_data`.
+<img width="940" height="507" alt="image" src="https://github.com/user-attachments/assets/05742c3c-c620-464b-89e6-142d86bc1dd8" />
 
-![WordPress installation screen](screenshots/04-wordpress-install-screen.png)
-
-### 5. WordPress site — running
-
-> 📸 **Capture from:** your browser at `http://<public-ip>` after completing the five-minute
-> install. Show the default theme homepage with your site title.
-
-![WordPress site running](screenshots/05-wordpress-site-live.png)
 
 ### 6. WordPress admin dashboard
 
-> 📸 **Capture from:** your browser at `http://<public-ip>/wp-admin` after logging in. Show the
-> dashboard — this proves the DB connection and admin account both work.
+<img width="940" height="722" alt="image" src="https://github.com/user-attachments/assets/a9a38819-a0c5-484c-b57b-b11a7bc445c1" />
 
-![WordPress admin dashboard](screenshots/06-wordpress-admin-dashboard.png)
 
 ### 7. EC2 instance in the AWS console
 
-> 📸 **Capture from:** AWS Console → EC2 → Instances (region **eu-north-1**). Show the instance
-> named **"WordPress Server Project 1"** in the `running` state with its public IP visible.
+<img width="1517" height="643" alt="image" src="https://github.com/user-attachments/assets/6eee3d54-f8ae-4eaa-bd7b-80abae0d2153" />
 
-![EC2 instance in AWS console](screenshots/07-aws-console-ec2.png)
 
 ### 8. Security group rules in the AWS console
 
-> 📸 **Capture from:** AWS Console → EC2 → Security Groups → `wordpress_sg` → Inbound rules.
-> Show the port 80 and port 22 rules.
 
-![Security group inbound rules](screenshots/08-aws-console-security-group.png)
+<img width="1600" height="653" alt="image" src="https://github.com/user-attachments/assets/bf1122ca-4306-4001-8a6a-4fb8eee29d03" />
+
 
 ### 9. The cloud-init log that exposed the failure *(if you still have it)*
 
@@ -236,14 +202,19 @@ terraform destroy                # tear it down when finished
 > quoted verbatim in [Issues #3](#3-what-the-log-showed--a-cascade-of-misleading-errors), which
 > tells the story fine on its own. Delete this section if you're not adding it.
 
-![cloud-init error log](screenshots/09-cloudinit-error-log.png)
+<img width="1752" height="617" alt="image" src="https://github.com/user-attachments/assets/f4560c07-8ccf-4278-85c8-21d5293b3bf5" />
+
 
 ### 10. `terraform destroy` — clean teardown *(optional but nice)*
 
 > 📸 **Capture from:** your terminal, after `terraform destroy`. Show
 > "Destroy complete! Resources: 2 destroyed." — demonstrates the full lifecycle.
 
-![terraform destroy output](screenshots/10-terraform-destroy.png)
+<img width="927" height="368" alt="image" src="https://github.com/user-attachments/assets/bf54ec16-5276-4aca-b2f4-5a36ac781b42" />
+
+<img width="957" height="403" alt="image" src="https://github.com/user-attachments/assets/c81b64fc-3421-47af-8abb-2a50e5cbbf74" />
+
+
 
 ---
 
