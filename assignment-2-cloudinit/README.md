@@ -189,11 +189,7 @@ whether configuration finished, instead of inferring it from whether the site lo
 
 ## Screenshots
 
-> Paste each image under its heading, then delete this line and the capture note above it.
-
 ### 1. terraform init
-
-> Capture: terminal in `assignment-2-cloudinit/`, after `terraform init`.
 
 <!-- paste screenshot 1 here -->
 
@@ -202,16 +198,12 @@ Provider downloaded and the backend initialised. The pinned `6.55.0` version res
 
 ### 2. terraform plan
 
-> Capture: terminal, after `terraform plan`, showing the "Plan: 2 to add" summary.
-
 <!-- paste screenshot 2 here -->
 
 Two resources: the security group and the instance. The AMI ID is already resolved here, because
 the `aws_ami` data source runs at plan time rather than apply time.
 
 ### 3. terraform apply, with the output URL
-
-> Capture: terminal, after apply, showing "Apply complete!" and the `nginx_url` output.
 
 <!-- paste screenshot 3 here -->
 
@@ -220,67 +212,19 @@ instance is running at this point, but cloud-init is still installing in the bac
 
 ### 4. The custom NGINX page
 
-> Capture: browser at `http://<public-ip>`, 2 to 3 minutes after apply.
-
 <!-- paste screenshot 4 here -->
 
-The payoff. This page was never uploaded anywhere. It was written by the `write_files` block in
-`cloud-init.yaml`, embedded in the instance's user_data by Terraform, and rendered onto disk by
-cloud-init on first boot. NGINX serving it proves the install, the file write and the service
-enable all completed.
+The payoff, and the one screenshot that proves the whole chain. This page was never uploaded
+anywhere. It was written by the `write_files` block in `cloud-init.yaml`, embedded into the
+instance's user_data by Terraform, and rendered onto disk by cloud-init on first boot. NGINX
+serving it means the install, the file write and the service enable all completed unattended.
 
-### 5. cloud-init status
-
-> Capture: EC2 Instance Connect, running `cloud-init status --long`.
+### 5. terraform destroy
 
 <!-- paste screenshot 5 here -->
 
-`status: done` is the definitive confirmation that every cloud-init module finished. This is the
-check that distinguishes "the instance booted" from "the instance is configured", which is exactly
-the gap that cost me time in project 1.
-
-### 6. cloud-init output log
-
-> Capture: EC2 Instance Connect, running `sudo cat /var/log/cloud-init-output.log`.
-
-<!-- paste screenshot 6 here -->
-
-The same log that exposed the failure in project 1, this time showing a clean run: apt updating,
-NGINX installing, no lock errors. Worth comparing directly against project 1's screenshot 6.
-
-### 7. NGINX service status
-
-> Capture: EC2 Instance Connect, running `systemctl status nginx`.
-
-<!-- paste screenshot 7 here -->
-
-`active (running)` and `enabled`, so the service survives a reboot rather than only running because
-something started it once.
-
-### 8. The EC2 instance in the AWS console
-
-> Capture: AWS Console, EC2, Instances, region eu-north-1.
-
-<!-- paste screenshot 8 here -->
-
-The instance running, tagged "Nginx-CloudInit-Assignment-2" from the `tags` block in `main.tf`.
-
-### 9. The security group rules
-
-> Capture: AWS Console, EC2, Security Groups, `nginx-web-sg`, inbound rules.
-
-<!-- paste screenshot 9 here -->
-
-Ports 80 and 22 inbound, created from the `ingress` blocks. Same caveat as project 1: open to
-`0.0.0.0/0`, which is fine for an assignment box and wrong for anything real.
-
-### 10. terraform destroy
-
-> Capture: terminal, after `terraform destroy`.
-
-<!-- paste screenshot 10 here -->
-
-Both resources removed cleanly, closing the lifecycle.
+Both resources removed cleanly, closing the lifecycle. The same state file that built the
+infrastructure knows how to take all of it back down.
 
 ---
 
@@ -316,18 +260,28 @@ bash script. Keeping them separate is why this project is shorter and didn't bre
 
 ## Issues I hit and how I fixed them
 
-*Add anything that bit you here. If this deploy ran clean first time, say so, that's a legitimate
-result and it's worth saying why: the apt lock problem from project 1 genuinely cannot occur with
-cloud-init's package module, which is the whole point of the comparison.*
+This one worked first time, which after project 1 was not what I expected.
 
-Candidates if they came up:
+That is the result worth reporting, though, because it isn't luck. Project 1 failed because my bash
+script raced `unattended-upgrades` for the dpkg lock, lost, and skipped the entire install without
+stopping. Every defensive line I added afterwards, the lock-wait loop, `DEBIAN_FRONTEND`, the
+`mkdir -p`, existed to work around problems that came from running my own script alongside the boot
+process instead of as part of it.
 
-- The AMI filter returning nothing after copying the 20.04 path across to 24.04
-  (`hvm-ssd` vs `hvm-ssd-gp3`)
-- `web-config.yaml` being renamed to `cloud-init.yaml`, and `file()` in `main.tf` needing to match
-- Hitting the URL too early and seeing a connection refused while cloud-init was still installing
-- YAML indentation errors, which cloud-init reports in `/var/log/cloud-init.log` rather than failing
-  visibly
+Cloud-init's `packages` module is the same code path Ubuntu itself uses to install packages during
+boot. There is no lock to race, because the package work is sequenced by the thing that owns the
+sequencing. The bug from project 1 cannot occur here, so there was nothing to debug.
+
+Two things did need attention:
+
+**The AMI filter is not the same as project 1's.** Canonical moved to gp3 root volumes for 24.04, so
+the path segment is `hvm-ssd-gp3` rather than `hvm-ssd`. Reusing the 20.04 filter and only swapping
+the release name matches nothing and the plan fails on an empty data source result.
+
+**The YAML filename has to stay in sync with `file()`.** I renamed `web-config.yaml` to
+`cloud-init.yaml` partway through, which means the `file("${path.module}/cloud-init.yaml")` call in
+`main.tf` has to match exactly. Terraform catches this at plan time rather than letting a broken
+instance boot, which is the failure I'd rather have.
 
 ---
 
