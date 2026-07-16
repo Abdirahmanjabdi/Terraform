@@ -388,11 +388,12 @@ Waited 3 to 4 minutes after apply, hit the URL, and WordPress loaded.
 
 What this build doesn't do yet. All deliberate scope rather than things I'm unaware of.
 
-1. **The database password is hardcoded in `setup.sh` and committed to a public repo.**
-   `REDACTED` sits in plaintext in the script and in git history. It only protects a
-   localhost-bound MySQL user on a throwaway box, so the blast radius is small, but the habit is the
-   problem. Real fix: a `sensitive` Terraform variable injected via `templatefile()`, or generate it
-   on the instance with `openssl rand`. Better still, AWS Secrets Manager.
+1. **The database password was originally hardcoded in `setup.sh`.** Fixed: the script now
+   generates it on the instance at boot with `openssl rand -hex 16`, so no secret exists in the
+   repo, and the history has been scrubbed. It only ever protected a localhost-bound MySQL user on
+   a since-destroyed box, but the habit was the problem. A production build would go further and
+   pull credentials from AWS Secrets Manager, or inject them as a `sensitive` Terraform variable
+   via `templatefile()`.
 
 2. **The security group description promises HTTPS but there's no port 443 rule.** The description
    reads "Allow HTTP, HTTPS and SSH" while only 80 and 22 are open. Either add the 443 ingress with

@@ -19,9 +19,12 @@ sudo systemctl enable apache2
 sudo systemctl start mysql
 sudo systemctl enable mysql
 
+# Generate the DB password on the instance so no secret ever lives in this repo
+DB_PASS=$(openssl rand -hex 16)
+
 # Set up the WordPress Database
 sudo mysql -u root -e "CREATE DATABASE wordpress;"
-sudo mysql -u root -e "CREATE USER 'wp_user'@'localhost' IDENTIFIED BY 'REDACTED';"
+sudo mysql -u root -e "CREATE USER 'wp_user'@'localhost' IDENTIFIED BY '${DB_PASS}';"
 sudo mysql -u root -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'wp_user'@'localhost';"
 sudo mysql -u root -e "FLUSH PRIVILEGES;"
 
@@ -42,7 +45,7 @@ sudo rm -f /var/www/html/index.html
 sudo cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
 sudo sed -i "s/database_name_here/wordpress/" /var/www/html/wp-config.php
 sudo sed -i "s/username_here/wp_user/" /var/www/html/wp-config.php
-sudo sed -i "s/password_here/REDACTED/" /var/www/html/wp-config.php
+sudo sed -i "s/password_here/${DB_PASS}/" /var/www/html/wp-config.php
 
 # Restart Apache to apply PHP configurations
 sudo systemctl restart apache2
