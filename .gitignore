@@ -1,0 +1,30 @@
+# Terraform state — contains plaintext secrets, never commit
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Provider binaries and modules — re-downloaded by `terraform init`
+**/.terraform/*
+
+# Variable files — commonly hold credentials
+*.tfvars
+*.tfvars.json
+!example.tfvars
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Plan output files — may contain sensitive values
+*.tfplan
+
+# CLI config with credentials
+.terraformrc
+terraform.rc
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Note: .terraform.lock.hcl is intentionally NOT ignored — it's committed
+# so provider versions stay reproducible across machines.
